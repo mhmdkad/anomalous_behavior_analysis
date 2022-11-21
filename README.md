@@ -1,8 +1,4 @@
 # Anomalous Customer Behavior Analysis
 
 ## Architecture:
-The plan of this project is to stream data about customers behavior and apply real-time analysis on it. <br/>
-First, with the given tabular data, another data will be generated having similar statistical properties as the input dataset. <br/>
-This later will be streamed through Kafka where minimum 8 sketches will be implemented representing real-time analysis of the streamed data and then will be stored in HBase database. <br/>
-For visualizing the sketche's results, different dashboards will be implemented, Grafana, kibana or tableau can be used for the purpose. <br/>
-Everything used from step of streaming will be containerized as Docker containers.
+Summary: A mock stream will be created using the excel file, it will be streamed into a topic in Kafka. We will have multiple consumers subscribed to this topic (each sketch will be a consumer reading the data from the topic in real time). Each student will create 2 consumers (2 sketches), they will be written in Flink or KStreams which are libraries we can use for real time processing (will be decided by tonight). The sketches will save the data in a table in HBase. In Hbase we will also have a table that will store the raw data in order to be able to synthesize it and save the synthesized data in a new table (we will use a library in python in order to synthesize the data). Then there will be a visualization open source technology connected to HBASE which will show visualizations in real time.
