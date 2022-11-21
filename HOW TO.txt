@@ -1,0 +1,27 @@
+//IMPORTANT: Go to the data folder, add the dataset and rename it to 'data'
+
+git clone https: //our repo//
+>cd //location of file//
+
+docker compose up
+
+//open new tab in powershell
+//downloads requirements 
+>docker build -t "kafkacsv" .
+
+
+//
+>docker run -it --rm kafkacsv python bin/sendStream.py -h
+
+//Start a consumer 
+//(This is a sample consumer that reads from the Kafka topic and prints the rows)
+// You Have to create your own consumer
+// switch "--speed 10" means that streaming is spead up by 10 times, you can change the number to control speed, or remove this switch and run in real time based on the timestamps in the dataset
+python bin/processStream.py my-stream --speed 10
+
+
+//open new tab in powershell
+//start a producer
+python bin/sendStream.py data/data.xlsx my-stream
+
+// To stop the streaming ctrl+c
