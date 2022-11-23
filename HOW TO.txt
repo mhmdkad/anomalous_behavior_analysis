@@ -16,12 +16,13 @@ docker compose up
 //Start a consumer 
 //(This is a sample consumer that reads from the Kafka topic and prints the rows)
 // You Have to create your own consumer
-// switch "--speed 10" means that streaming is spead up by 10 times, you can change the number to control speed, or remove this switch and run in real time based on the timestamps in the dataset
-python bin/processStream.py my-stream --speed 10
+
+python bin/processStream.py my-stream 
 
 
 //open new tab in powershell
 //start a producer
-python bin/sendStream.py data/data.xlsx my-stream
+// switch "--speed 10" means that streaming is spead up by 10 times, you can change the number to control speed, or remove this switch and run in real time based on the timestamps in the dataset
+python bin/sendStream.py data/data.xlsx my-stream --speed 10
 
 // To stop the streaming ctrl+c
