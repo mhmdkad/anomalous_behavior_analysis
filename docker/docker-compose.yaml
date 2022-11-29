@@ -1,0 +1,77 @@
+version: '3'
+services:
+  kafka:
+    logging:
+      driver: local
+    ports:
+      - 29094:29092
+      - 29103:29101
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://127.0.0.1:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1   
+      EXTRA_ARGS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent-0.17.0.jar=29101:/usr/share/jmx_exporter/kafka-broker.yaml
+    image: confluentinc/cp-kafka:latest
+    networks:
+      - kafka
+    volumes:
+      - ./jmx-exporter:/usr/share/jmx_exporter/
+      - kafka-jmx-volume:/jmx-exporter
+    depends_on:
+      - zookeeper
+  zookeeper:
+    logging:
+      driver: local
+    ports:
+      - 32181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    image: confluentinc/cp-zookeeper:latest
+    networks:
+      - kafka
+  prometheus:
+    image: prom/prometheus:latest
+    logging:
+      driver: local
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus-volume:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    networks:
+      - kafka
+    restart: always
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    logging:
+      driver: local
+    volumes:
+      - grafana-volume:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    networks:
+      - kafka
+    environment:
+      - "GF_SECURITY_ADMIN_USER=kafka"
+      - "GF_SECURITY_ADMIN_PASSWORD=kafka"
+      - "GF_USERS_ALLOW_SIGN_UP=false"
+    ports:
+      - 3000:3000
+volumes:
+  kafka-jmx-volume:
+  grafana-volume:
+  prometheus-volume:
+networks:
+  kafka:
+    external: false
