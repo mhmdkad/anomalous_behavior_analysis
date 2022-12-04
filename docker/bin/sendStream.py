@@ -19,6 +19,8 @@ def acked(err, msg):
         print("Failed to deliver message: %s: %s" % (str(msg.value()), str(err)))
     else:
         print("Message produced: %s" % (str(msg.value())))
+        #err
+        
 
 
 def main():
@@ -34,12 +36,12 @@ def main():
     topic = args.topic
     p_key = args.filename
 
-    conf = {'bootstrap.servers': "localhost:29094",
+    conf = {'bootstrap.servers': "localhost:9092",
             'client.id': socket.gethostname()}
     producer = Producer(conf)
     
-    rdr = pd.read_excel(args.filename, 'cdn_customer_qoe_anon')
-    rdr.to_csv (r''+args.filename+'.csv', index = None, header=True)
+    #rdr = pd.read_excel(args.filename, 'cdn_customer_qoe_anon')
+    #rdr.to_csv (r''+args.filename+'.csv', index = None, header=True)
 
     rdr = csv.reader(open(args.filename+'.csv'))
 
@@ -55,15 +57,17 @@ def main():
 
             if firstline is True:
                 line1 = next(rdr, None)
-                res = dict(zip(header, line1))
-                timestamp, value = line1[1], res
-                
+
                 # Convert csv columns to key value pair
-                result = {}
-                result[timestamp] = value
+                res = dict(zip(header, line1))
+                timestamp = line1[1]
+
                 # Convert dict to json as message format
-                jresult = json.dumps(result)
+                jresult = json.dumps(res)
                 firstline = False
+
+                i= i + 1
+                p_key = str(i)
 
                 producer.produce(topic, key=p_key, value=jresult, callback=acked)
 
@@ -74,11 +78,15 @@ def main():
                 diff = ((d2 - d1).total_seconds())/args.speed
                 time.sleep(diff)
 
-                res = dict(zip(header, line1))
-                timestamp, value = line1[1], res
-                result = {}
-                result[timestamp] = value
-                jresult = json.dumps(result)
+                # Convert csv columns to key value pair
+                res = dict(zip(header, line))
+                timestamp = line[1]
+
+                # Convert dict to json as message format
+                jresult = json.dumps(res)
+
+                i= i + 1
+                p_key = str(i)
 
                 producer.produce(topic, key=p_key, value=jresult, callback=acked)
 
