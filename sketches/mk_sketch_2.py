@@ -9,7 +9,13 @@ import sys
 import time
 import socket
 from confluent_kafka import Consumer, KafkaError, KafkaException
-import math
+import mmh3
+from statistics import mean, median
+
+
+NUM_OF_HASH_FUNCTIONS = 10
+fileTailLengths = [0]*NUM_OF_HASH_FUNCTIONS
+SIZE_GROUP = 5
 
 
 def msg_process(msg):
@@ -18,22 +24,38 @@ def msg_process(msg):
     val = msg.value()
     dval = json.loads(val)
     # print(time_start, dval)
-    return time_start, dval
+    return time_start, dval['User_ID_N']
 
-def flajoletMartin(dval, total_zeroes, total_buckets, k):
-    h = hash(str(dval)) #convert the value into a string because python hashes integers to themselves
-    bucket = h & (total_buckets - 1) #Finds the bucket where the number of ending zero's are appended 
-    bucket_hash = h >> k #move the bits of the hash to the right to use the binary digits without the bucket digits 
-    total_zeroes[bucket] = max(total_zeroes[bucket], zero_counter(bucket_hash))
-    
-    return math.ceil(2 ** (float(sum(total_zeroes)) / total_buckets) * total_buckets * 0.79402), total_zeroes
 
-def zero_counter(number):
-    """Counts the number of consecutive 0's at the end of the number"""
-    x = 0
-    while (number >> x) & 1 == 0:
-        x = x + 1
-    return x
+def get_tail_length(bitArr):
+    """ Calculates the number of 0s at the end of the bitstring """
+    bitStr = str(bitArr)
+    return len(bitArr) - len(bitStr.rstrip('0'))
+
+def process_line(line):
+    """ takes a string, applies 10 hash functions on it 
+    returns a list of tail lengths for each hash function """
+# =============================================================================
+# get the hash values for each fxn and convert it to bit string
+# =============================================================================
+    binaryHashValues = [format(mmh3.hash(line, seed=i, signed=False), '032b') for i in range(0,NUM_OF_HASH_FUNCTIONS)]
+# =============================================================================
+# get the tail length for each hash fxn
+# =============================================================================
+    tailLengths = [get_tail_length(val) for val in binaryHashValues]
+    return tailLengths
+
+def process_one_file(dval):
+
+    global fileTailLengths
+
+    #get the tail length for each hash function
+    tailLengths = process_line(dval)
+    #get the maximum tail length for each hash function
+    for i in range(0,NUM_OF_HASH_FUNCTIONS):
+        fileTailLengths[i] = max(fileTailLengths[i], tailLengths[i])
+
+    return fileTailLengths
 
 
 def main():
@@ -41,9 +63,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('topic', type=str,
                         help='Name of the Kafka topic to stream.')
+    #parser.add_argument('k', type=str,
+    #                    help='The number of bits of hash to use as a bucket number.')
 
     args = parser.parse_args()
-
+    
     conf = {'bootstrap.servers': 'localhost:9092',
             'default.topic.config': {'auto.offset.reset': 'smallest'},
             'group.id': socket.gethostname()}
@@ -54,20 +78,7 @@ def main():
 
     # Flajolet Martin
     # ---------------
-    """Estimates the number of unique elements in the input set values.
-    Inputs:
-    data: The data for which the cardinality has to be estimated.
-    k: The number of bits of hash to use as a bucket number. The number of buckets is 2^k
-    
-    Output:
-    Returns the estimated number of unique items in the dataset
-    """
 
-    k = 4
-    total_buckets = 2 ** k
-    total_zeroes = []
-    for i in range(total_buckets):
-        total_zeroes.append(0)
 
 
     try:
@@ -89,9 +100,13 @@ def main():
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
+                # Sketch update 
                 time_start, dval = msg_process(msg)
-                distint_values, total_zeroes = flajoletMartin(dval, total_zeroes, total_buckets, k)
-                print(distint_values)
+                process_one_file(dval)
+                R = mean([median(fileTailLengths[i:i+SIZE_GROUP]) for i in range(0,NUM_OF_HASH_FUNCTIONS, SIZE_GROUP)])
+    
+                print("R is ", R)
+                print("Unique count is ", 2**R)
                
 
     except KeyboardInterrupt:
