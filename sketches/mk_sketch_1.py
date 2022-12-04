@@ -17,7 +17,11 @@ def msg_process(msg):
     time_start = time.strftime("%Y-%m-%d %H:%M:%S")
     val = msg.value()
     dval = json.loads(val)
-    print(time_start, dval)
+    device_used = dval['Device']
+    if device_used == 'Android' :
+        return True
+    else:
+        return False
 
 
 class MorrisAlpha:
@@ -39,6 +43,7 @@ class MorrisAlpha:
 
 def main():
 
+    # stream parsinng code 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('topic', type=str,
                         help='Name of the Kafka topic to stream.')
@@ -53,6 +58,7 @@ def main():
 
     running = True
 
+    # Sketch code
     morris = MorrisAlpha()
 
     try:
@@ -74,8 +80,10 @@ def main():
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
-                #msg_process(msg)
-                morris.update()
+                # msg_process(msg)
+                update_morries_counter = msg_process(msg)
+                if update_morries_counter:
+                    morris.update()
                 print(morris.query())
 
     except KeyboardInterrupt:
