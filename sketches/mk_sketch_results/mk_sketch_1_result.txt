@@ -1,0 +1,11 @@
+Three terminals:
+
+- left terminal:
+	- showing the live stream of data from the producer and sending it to topic "my-stream"
+
+- middle terminal:
+	- showing the count update with every new streamed data, we are counting here the number of devices used from "Android" 
+	- sending only the updated count to another topuic named "mk_sketch_1"
+
+- right terminal:
+	- showing the streamed result of Morris counter at topic "mk_sketch_1"
