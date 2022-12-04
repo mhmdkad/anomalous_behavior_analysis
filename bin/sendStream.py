@@ -69,13 +69,11 @@ def main():
 
             else:
                 line = next(rdr, None)
-                d1 = parse(timestamp)
-                d2 = parse(line[1])
-                diff = ((d2 - d1).total_seconds())/args.speed
-                time.sleep(diff)
+               
+                time.sleep(args.speed)
 
-                res = dict(zip(header, line1))
-                timestamp, value = line1[1], res
+                res = dict(zip(header, line))
+                timestamp, value = line[1], res
                 result = {}
                 result[timestamp] = value
                 jresult = json.dumps(result)
