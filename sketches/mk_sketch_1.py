@@ -8,7 +8,7 @@ import json
 import sys
 import time
 import socket
-from confluent_kafka import Consumer, KafkaError, KafkaException
+from confluent_kafka import Consumer, Producer, KafkaError, KafkaException
 import random
 
 
@@ -61,6 +61,11 @@ def main():
     # Sketch code
     morris = MorrisAlpha()
 
+    # open a stream to send sketch queries
+    conf = {'bootstrap.servers': "localhost:9092",
+            'client.id': socket.gethostname()}
+    producer = Producer(conf)
+
     try:
         while running:
             consumer.subscribe([args.topic])
@@ -83,7 +88,12 @@ def main():
                 # msg_process(msg)
                 update_morries_counter = msg_process(msg)
                 if update_morries_counter:
+                    # updare the counter
                     morris.update()
+                    # send the result to a tream 
+                    morris_count = str(morris.query())
+                    producer.produce('mk_sketch_1', key='Morris', value= morris_count)
+                    producer.flush()
                 print(morris.query())
 
     except KeyboardInterrupt:
