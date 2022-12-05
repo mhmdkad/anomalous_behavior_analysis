@@ -9,11 +9,11 @@ Run the related kafka containers using *docker-compose*, execute the following c
 
 2. Producer
 
-The Kafka Producer has the role to turn the test csv file into streamed data and send it to spark for real-time clustering prediction.
+The Kafka Producer has the role to turn the Excil file into streamed data and send it to a cosumer where the sketches will be implemented later.
 	
 From this directory the following command can be used to run the producer:
 
-        python /bin/sendStream.py [Path to the CSV File] [Name of the Kafka topic] [Optional: Multiplying factor for the sending speed]
+        python /bin/sendStream.py [Path to the Excil File] [Name of the Kafka topic] [Optional: Multiplying factor for the sending speed]
 		
 Therefore, to launch a producer for our dataset (in actual speed):
         
