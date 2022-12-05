@@ -7,7 +7,6 @@ Run the related kafka containers using *docker-compose*, execute the following c
 
         docker-compose up -d
 	
-	# open new cmd/powershell
 	docker build -t "kafkacsv" .
 	docker run -it --rm kafkacsv python bin/sendStream.py -h
 	
@@ -39,7 +38,7 @@ Therefore, to launch a producer for our dataset (in actual speed):
 		
 It is also possible to add a third argue to specify a multiplying factor to the speed. For example to multiply the speed by 1000 (compared to the original timestamp) the following command should be used:
 
-        python /docker/bin/sendStream.py "/data/data/data.xlsx" my-stream --speed 10
+        python /docker/bin/sendStream.py "/docker/data/<file_name>.xlsx" my-stream --speed 10
 	
 	
 4. Grafana
