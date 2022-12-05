@@ -26,7 +26,7 @@ def main():
 
     args = parser.parse_args()
 
-    conf = {'bootstrap.servers': 'localhost:9092',
+    conf = {'bootstrap.servers': 'localhost:29094',
             'default.topic.config': {'auto.offset.reset': 'smallest'},
             'group.id': socket.gethostname()}
 

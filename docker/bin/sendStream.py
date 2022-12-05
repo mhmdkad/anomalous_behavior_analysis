@@ -76,7 +76,7 @@ def main():
                 d1 = parse(timestamp)
                 d2 = parse(line[1])
                 diff = ((d2 - d1).total_seconds())/args.speed
-                time.sleep(diff)
+                #time.sleep(diff)
 
                 # Convert csv columns to key value pair
                 res = dict(zip(header, line))
