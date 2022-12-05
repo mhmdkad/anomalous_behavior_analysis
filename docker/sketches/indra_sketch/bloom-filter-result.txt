@@ -1,0 +1,5 @@
+- blomm-filter 1st terminal:
+	- showing the live stream of data from the producer and sending it to topic "my-stream"
+
+- bloom-filter 2nd terminal:
+	- showing the streamed result of Bloom Filter on filtering Device 'Android TV'
