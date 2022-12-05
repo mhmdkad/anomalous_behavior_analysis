@@ -40,8 +40,8 @@ def main():
             'client.id': socket.gethostname()}
     producer = Producer(conf)
     
-    #rdr = pd.read_excel(args.filename, 'cdn_customer_qoe_anon')
-    #rdr.to_csv (r''+args.filename+'.csv', index = None, header=True)
+    rdr = pd.read_excel(args.filename, 'cdn_customer_qoe_anon')
+    rdr.to_csv (r''+args.filename+'.csv', index = None, header=True)
 
     rdr = csv.reader(open(args.filename+'.csv'))
 
