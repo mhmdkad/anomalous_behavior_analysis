@@ -36,7 +36,7 @@ def main():
     topic = args.topic
     p_key = args.filename
 
-    conf = {'bootstrap.servers': "localhost:9092",
+    conf = {'bootstrap.servers': "localhost:29094",
             'client.id': socket.gethostname()}
     producer = Producer(conf)
     
