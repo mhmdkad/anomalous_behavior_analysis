@@ -44,10 +44,13 @@ It is also possible to add a third argue to specify a multiplying factor to the 
 	
 4. Grafana
 
-	open browser localhost:3000 for grafana
-	login grafana user:kafka pass:kafka
-	in left panel click search symbol you will find 2 dashboard already there
-	Enjoy!
+		open browser localhost:3000 for grafana
+	
+		login grafana user:kafka pass:kafka
+	
+		in left panel click search symbol you will find 2 dashboard already there
+	
+Enjoy!
 		
 
 	
