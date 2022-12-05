@@ -1,0 +1,5 @@
+confluent-kafka
+pandas
+requests
+avro-python3
+datetime
