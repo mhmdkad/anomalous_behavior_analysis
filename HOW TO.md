@@ -6,7 +6,6 @@
 Run the related kafka containers using *docker-compose*, execute the following command from this directory:
 
         docker-compose up -d
-	
 	docker build -t "kafkacsv" .
 	docker run -it --rm kafkacsv python bin/sendStream.py -h
 	
