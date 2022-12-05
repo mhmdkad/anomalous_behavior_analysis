@@ -1,4 +1,4 @@
-### HOW TO RUN DOCKER
+### HOW TO RUN DOCKER AND SHOW REULTS OF GRAFANA
 
   1. open cmd/powershell
   2. git clone (this repo)
