@@ -8,7 +8,7 @@ import json
 import sys
 import time
 import socket
-from confluent_kafka import Consumer, KafkaError, KafkaException
+from confluent_kafka import Consumer, Producer, KafkaError, KafkaException
 import mmh3
 from statistics import mean, median
 
@@ -79,7 +79,12 @@ def main():
     # Flajolet Martin
     # ---------------
 
+    # open a stream to send sketch queries
+    conf = {'bootstrap.servers': "localhost:9092",
+            'client.id': socket.gethostname()}
+    producer = Producer(conf)
 
+    R_old = 0
 
     try:
         while running:
@@ -104,9 +109,19 @@ def main():
                 time_start, dval = msg_process(msg)
                 process_one_file(dval)
                 R = mean([median(fileTailLengths[i:i+SIZE_GROUP]) for i in range(0,NUM_OF_HASH_FUNCTIONS, SIZE_GROUP)])
-    
-                print("R is ", R)
-                print("Unique count is ", 2**R)
+               
+                if(R==R_old):
+                    pass
+                else:
+                    # send the result to a tream 
+                    flajolet_count = str(round(2**R))
+                    producer.produce('mk_sketch_2', key='Flajolet', value= flajolet_count)
+                    producer.flush()
+
+                R_old = R
+                #print("R is ", R)
+                time_start = time.strftime("%Y-%m-%d %H:%M:%S")
+                print(time_start, " Unique count of users ID is ", 2**R)
                
 
     except KeyboardInterrupt:
